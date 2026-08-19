@@ -20,7 +20,7 @@ RUN dotnet restore "src/Presentation.WebApp/Presentation.WebApp.csproj"
 COPY . .
 
 WORKDIR /src/Presentation.WebApp
-RUN npm ci
+RUN npm install
 
 WORKDIR /src
 
