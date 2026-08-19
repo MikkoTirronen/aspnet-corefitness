@@ -19,8 +19,10 @@ RUN dotnet restore "src/Presentation.WebApp/Presentation.WebApp.csproj"
 
 COPY . .
 
-# Install frontend dependencies
+WORKDIR /src/Presentation.WebApp
 RUN npm ci
+
+WORKDIR /src
 
 RUN dotnet publish "src/Presentation.WebApp/Presentation.WebApp.csproj" \
     -c Release \
