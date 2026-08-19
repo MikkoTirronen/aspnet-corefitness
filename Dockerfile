@@ -5,7 +5,6 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-# Install Node.js/npm for Tailwind build
 RUN apt-get update \
     && apt-get install -y nodejs npm \
     && rm -rf /var/lib/apt/lists/*
@@ -19,7 +18,6 @@ RUN dotnet restore "src/Presentation.WebApp/Presentation.WebApp.csproj"
 
 COPY . .
 
-# Install frontend dependencies
 WORKDIR /src/Presentation.WebApp
 RUN npm ci
 
