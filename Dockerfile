@@ -5,6 +5,11 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
+# Install Node.js/npm for Tailwind build
+RUN apt-get update \
+    && apt-get install -y nodejs npm \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY ["src/Presentation.WebApp/Presentation.WebApp.csproj", "src/Presentation.WebApp/"]
 COPY ["src/Application/Application.csproj", "src/Application/"]
 COPY ["src/Infrastructure/Infrastructure.csproj", "src/Infrastructure/"]
@@ -14,6 +19,12 @@ RUN dotnet restore "src/Presentation.WebApp/Presentation.WebApp.csproj"
 
 COPY . .
 
+# Install frontend dependencies
+WORKDIR /src/src/Presentation.WebApp
+RUN npm ci
+
+WORKDIR /src
+
 RUN dotnet publish "src/Presentation.WebApp/Presentation.WebApp.csproj" \
     -c Release \
     -o /app/publish \
@@ -21,6 +32,7 @@ RUN dotnet publish "src/Presentation.WebApp/Presentation.WebApp.csproj" \
 
 FROM base AS final
 WORKDIR /app
+
 COPY --from=build /app/publish .
 
 ENTRYPOINT ["dotnet", "Presentation.WebApp.dll"]
