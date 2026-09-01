@@ -2,7 +2,7 @@ using Infrastructure.Identity;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Seed;
 using Microsoft.AspNetCore.Identity;
-
+using Microsoft.EntityFrameworkCore;
 using Presentation.WebApp.DependencyInjections.Application;
 using Presentation.WebApp.DependencyInjections.Infrastructure;
 
@@ -36,30 +36,29 @@ if (!app.Environment.IsDevelopment())
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    GymClassSeeder.Seed(db);
-}
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<AppDbContext>();
+
+    // Create/update database tables before querying or seeding them
+    await db.Database.MigrateAsync();
 
     GymClassSeeder.Seed(db);
 
-    var roleManager = scope.ServiceProvider
-        .GetRequiredService<RoleManager<IdentityRole>>();
+    var roleManager =
+        services.GetRequiredService<RoleManager<IdentityRole>>();
 
-    var userManager = scope.ServiceProvider
-        .GetRequiredService<UserManager<ApplicationUser>>();
-
-    // Roles
+    var userManager =
+        services.GetRequiredService<UserManager<ApplicationUser>>();
 
     if (!await roleManager.RoleExistsAsync("Admin"))
+    {
         await roleManager.CreateAsync(new IdentityRole("Admin"));
+    }
 
     if (!await roleManager.RoleExistsAsync("Member"))
+    {
         await roleManager.CreateAsync(new IdentityRole("Member"));
-
-    // Admin user
+    }
 
     const string adminEmail = "admin@test.com";
     const string adminPassword = "Administrator@1";
