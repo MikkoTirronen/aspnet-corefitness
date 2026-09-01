@@ -11,11 +11,12 @@
     </PackageReference>
   </ItemGroup>
   <Target Name="TailwindBuild" BeforeTargets="Build">
-    <Exec Command="npx tailwindcss -i wwwroot/css/site.css -o wwwroot/css/site.min.css" />
-  </Target>
-  <Target Name="TailwindWatch" BeforeTargets="Run">
-    <Exec Command="npx tailwindcss -i wwwroot/css/site.css -o wwwroot/css/site.min.css --watch" />
-  </Target>
+  <Exec Command="npx @tailwindcss/cli -i wwwroot/css/site.css -o wwwroot/css/site.min.css --minify" />
+</Target>
+
+<Target Name="TailwindWatch" BeforeTargets="Run">
+  <Exec Command="npx @tailwindcss/cli -i wwwroot/css/site.css -o wwwroot/css/site.min.css --watch" />
+</Target>
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
